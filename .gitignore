@@ -1,0 +1,7 @@
+*.udpipe
+.Rhistory
+.DS_Store
+.Rproj
+.Rproj.user
+.Rhistory
+.Ruserdata
