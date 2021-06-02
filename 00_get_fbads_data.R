@@ -44,7 +44,7 @@ tibble(
     ))
 ) -> party_ids
 
-saveRDS(party_ids, "output/party_profiles.RData")
+# saveRDS(party_ids, "output/party_profiles.RData")
 
 party_leaders <- party_ids %>% filter(!is.na(party_leader_id)) %>% pull(party_leader_id)
 # search_pages <- c(party_ids$page_id, party_leaders)

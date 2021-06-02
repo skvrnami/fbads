@@ -1,6 +1,8 @@
 library(dplyr)
 library(udpipe)
 library(tidylo)
+library(ggplot2)
+library(patchwork)
 
 # https://doi.org/10.1093/pan/mpn018
 
@@ -9,10 +11,20 @@ parties_pages <- readRDS("output/party_profiles.RData")
 parties_ads_files <- list.files("output/", "parties_ads*", full.names = TRUE)
 leaders_ads_files <- list.files("output/", "leaders_ads*", full.names = TRUE)
 
-parties_ads <- readRDS(parties_ads_files) %>%
+read_ad_files <- function(party_files){
+    purrr::map(party_files, function(x) readRDS(x) %>% 
+                   mutate(date = as.Date(stringr::str_extract(x, "[0-9]{4}-[0-9]{2}-[0-9]{2}")))) %>%
+        bind_rows() %>%
+        group_by(adlib_id) %>%
+        arrange(desc(date)) %>%
+        filter(row_number() == 1) %>%
+        ungroup
+}
+
+parties_ads <- read_ad_files(parties_ads_files) %>%
     left_join(., parties_pages, by = "page_id") %>%
     select(-party_leader_id)
-leaders_ads <- readRDS(leaders_ads_files) %>%
+leaders_ads <- read_ad_files(leaders_ads_files) %>%
     left_join(., parties_pages %>% select(-page_id), by = c("page_id"="party_leader_id"))
 
 all_ads <- bind_rows(parties_ads, leaders_ads)
@@ -33,14 +45,14 @@ x <- udpipe_annotate(ud_model,
                      doc_id = unique_ads$doc_id)
 lemmas <- as.data.frame(x)
 lemmas_df <- lemmas %>%
+    filter(upos %in% c("ADJ", "ADV", "NOUN", "PROPN", "SYM", "VERB")) %>%
     left_join(unique_ads %>% mutate(doc_id = as.character(doc_id)), by = "doc_id")
 
 lemma_log_odds <- lemmas_df %>% 
-    filter(upos %in% c("ADJ", "ADV", "NOUN", "PROPN", "SYM", "VERB")) %>%
     count(party, lemma) %>% 
     bind_log_odds(party, lemma, n) 
 
-ad_parties <- unique(lemma_log_ods$party)
+ad_parties <- unique(lemma_log_odds$party)
 
 chart_log_odds <- function(df = lemma_log_odds, party = ad_parties[1]){
     party_name <- party
@@ -70,7 +82,6 @@ chart_log_odds <- function(df = lemma_log_odds, party = ad_parties[1]){
 
 parties_charts <- purrr::map(ad_parties, function(x) chart_log_odds(party = x))
 
-library(patchwork)
 (parties_charts[[1]] | parties_charts[[2]] | parties_charts[[3]]) / 
     (parties_charts[[4]] | parties_charts[[5]] | parties_charts[[6]]) / 
     (parties_charts[[7]] | parties_charts[[8]] | plot_spacer()) + 
