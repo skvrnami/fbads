@@ -57,6 +57,8 @@ lemma_log_odds <- lemmas_df %>%
     count(party, lemma) %>% 
     bind_log_odds(party, lemma, n) 
 
+write.csv(lemma_log_odds, file = "output/fb_ads_words.csv", row.names = FALSE)
+
 ad_parties <- unique(lemma_log_odds$party)
 
 chart_log_odds <- function(df = lemma_log_odds, party = ad_parties[1]){
