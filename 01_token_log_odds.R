@@ -37,8 +37,13 @@ unique_ads <- all_ads %>%
 write.csv(unique_ads, file = "output/unique_ads.csv", row.names = FALSE)
 
 # Lemmatize ads
-ud_model <- udpipe_download_model(language = "czech")
-ud_model <- udpipe_load_model(ud_model$file_model)
+udpipe_file <- list.files(".", "*.udpipe")
+if(length(udpipe_file)){
+    ud_model <- udpipe_load_model(udpipe_file) 
+}else{
+    ud_model <- udpipe_download_model(language = "czech")    
+    ud_model <- udpipe_load_model(ud_model$file_model)
+}
 
 x <- udpipe_annotate(ud_model, 
                      x = unique_ads$ad_creative_body, 
