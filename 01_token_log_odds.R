@@ -31,6 +31,7 @@ all_ads <- bind_rows(parties_ads, leaders_ads)
 
 unique_ads <- all_ads %>%
     select(ad_creation_time, ad_creative_body, party, page_name) %>%
+    filter(ad_creation_time >= "2021-01-01") %>%
     unique %>%
     mutate(doc_id = row_number())
 
