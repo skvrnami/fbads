@@ -22,10 +22,11 @@ read_ad_files <- function(party_files){
 }
 
 parties_ads <- read_ad_files(parties_ads_files) %>%
-    left_join(., parties_pages, by = "page_id") %>%
+    full_join(., parties_pages, by = "page_id") %>%
     select(-party_leader_id)
 leaders_ads <- read_ad_files(leaders_ads_files) %>%
-    left_join(., parties_pages %>% select(-page_id), by = c("page_id"="party_leader_id"))
+    full_join(., parties_pages %>% select(-page_id), by = c("page_id"="party_leader_id")) %>%
+    mutate(party = ifelse(is.na(party), "Oath (Přísaha)", party))
 
 all_ads <- bind_rows(parties_ads, leaders_ads)
 
@@ -72,7 +73,8 @@ chart_log_odds <- function(df = lemma_log_odds, party = ad_parties[1]){
                     "Christian Democrats (KDU-ČSL)" = "#e6ac21", 
                     "SPD" = "#8B4513", 
                     "Mayors and Independents (STAN)" = "#99FFCC",
-                    "Pirates (Piráti)" = "#000000")
+                    "Pirates (Piráti)" = "#000000", 
+                    "Oath (Přísaha)"="#0033FF")
     
     tmp <- df %>%
         filter(party == party_name) %>%
@@ -92,7 +94,8 @@ parties_charts <- purrr::map(ad_parties, function(x) chart_log_odds(party = x))
 
 (parties_charts[[1]] | parties_charts[[2]] | parties_charts[[3]]) / 
     (parties_charts[[4]] | parties_charts[[5]] | parties_charts[[6]]) / 
-    (parties_charts[[7]] | parties_charts[[8]] | parties_charts[[9]]) + 
+    (parties_charts[[7]] | parties_charts[[8]] | parties_charts[[9]]) / 
+    (parties_charts[[10]] | plot_spacer() | plot_spacer()) + 
     plot_annotation(title = 'Log of odds of words used in FB Ads by parties')
 
 ggsave("output/charts/log-odds.png", width = 12, height = 8)
