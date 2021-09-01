@@ -98,4 +98,4 @@ parties_charts <- purrr::map(ad_parties, function(x) chart_log_odds(party = x))
     (parties_charts[[10]] | plot_spacer() | plot_spacer()) + 
     plot_annotation(title = 'Log of odds of words used in FB Ads by parties')
 
-ggsave("output/charts/log-odds.png", width = 12, height = 8)
+ggsave("output/charts/log-odds.png", width = 12, height = 10)
