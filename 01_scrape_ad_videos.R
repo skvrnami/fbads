@@ -3,10 +3,10 @@ library(RSelenium)
 library(Radlibrary)
 
 access_token <- token_get()$token
-leaders_ads <- readRDS("output/leaders_ads_2021-09-01.RData")
-parties_ads <- readRDS("output/parties_ads_2021-09-01.RData")
+# leaders_ads <- readRDS("output/leaders_ads_2021-09-01.RData")
+# parties_ads <- readRDS("output/parties_ads_2021-09-01.RData")
 
-url <- glue::glue("https://www.facebook.com/ads/archive/render_ad/?id=367215521451359&access_token={access_token}")
+url <- glue::glue("https://www.facebook.com/ads/archive/render_ad/?id=1040437186723679&access_token={access_token}")
 
 remDr <- remoteDriver(
     remoteServerAddr = "localhost",
