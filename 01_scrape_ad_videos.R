@@ -2,7 +2,6 @@ library(rvest)
 library(RSelenium)
 library(Radlibrary)
 
-access_token <- token_get()$token
 leaders_ads <- readRDS("output/leaders_ads_2021-09-08.RData")
 # parties_ads <- readRDS("output/parties_ads_2021-09-01.RData")
 
