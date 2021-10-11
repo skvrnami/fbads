@@ -28,7 +28,11 @@ leaders_ads <- read_ad_files(leaders_ads_files) %>%
     full_join(., parties_pages %>% select(-page_id), by = c("page_id"="party_leader_id")) %>%
     mutate(party = ifelse(is.na(party), "Oath (Přísaha)", party))
 
-all_ads <- bind_rows(parties_ads, leaders_ads)
+all_ads <- bind_rows(parties_ads, leaders_ads) %>%
+    mutate(ad_creative_body = gsub("\\n", " ", ad_creative_body), 
+           ad_creative_link_description = gsub("\\n", " ", ad_creative_link_description)) %>%
+    select(-date) %>%
+    select(ad_creation_time, party, page_name, everything())
 
 write.csv(all_ads, file = "output/all_ads.csv", row.names = FALSE)
 
