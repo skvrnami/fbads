@@ -30,6 +30,8 @@ leaders_ads <- read_ad_files(leaders_ads_files) %>%
 
 all_ads <- bind_rows(parties_ads, leaders_ads)
 
+write.csv(all_ads, file = "output/all_ads.csv", row.names = FALSE)
+
 unique_ads <- all_ads %>%
     select(ad_creation_time, ad_creative_body, party, page_name) %>%
     filter(ad_creation_time >= "2021-01-01") %>%
